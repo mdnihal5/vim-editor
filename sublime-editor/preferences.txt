@@ -1,0 +1,21 @@
+{
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"color_scheme": "Packages/Theme - Cyanide/Monocyanide - Black.tmTheme",
+	"theme": "Cyanide.sublime-theme",
+	"dark_color_scheme": "Monokai.sublime-color-scheme",
+	"light_color_scheme": "Celeste.sublime-color-scheme",
+	"font_size": 12,
+	"caret_style": "smooth",
+	"highlight_line": true,
+	"index_files": true,
+	"icon_file_type_enable": true,
+	"centurion_folder_icons": true,
+	"contrasted_sidebar": true,
+	"contrasted_tabs": true,
+	"contrasted_quick_panel": true,
+	"large_scroll_bars": true
+
+}
