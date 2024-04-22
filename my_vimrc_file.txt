@@ -30,10 +30,13 @@ noremap <F7> <ESC> :w !python3 <CR>
 "noremap <F5> <ESC> :w <CR> :!avrdude -v -patmega328p -P /dev/cu.usbmodemHID* -c arduino -U flash:w:"out.elf"<CR>
 
 noremap <C-f> G31
-noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
-inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
+"   ---> error for -fsanitize=address   <------
+"noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
+"inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
 
 " -pthread
+noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
+inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
 
 noremap <F8> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
 inoremap <F8> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
