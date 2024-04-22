@@ -1,3 +1,17 @@
+snippet snips "show snippets"
+/*
+1. normal -> templete
+2. simple -> simple templete
+3. c++ -> basic c++ templete
+4. segmenttree -> segtree
+5. primes ->"prime operations
+6. binpower -> binexpo
+7. inverse -> modinverse
+8. orderedset -> pbds
+9. combinations -> nCr
+10. dijkstra -> dijkstra
+*/
+endsnippet
 snippet normal "normal"
 // Author : md_nihal
 
@@ -294,7 +308,7 @@ int nCr(int a, int b) {
 	return fact[a] * 1ll * exp(fact[b] * 1ll * fact[a - b] % mod, mod - 2) % mod;
 }
 endsnippet
-snippet dikstra "dikstra"
+snippet dijkstra "dikstra"
 vector<int>dikstra(vector<vector<pii>>&graph, int source, int n) {
 	priority_queue<pii, vector<pii>, greater<pii>>pq;
 	vector<int>dist(n, inf);
@@ -313,3 +327,4 @@ vector<int>dikstra(vector<vector<pii>>&graph, int source, int n) {
 	return dist;
 }
 endsnippet
+
