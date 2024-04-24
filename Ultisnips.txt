@@ -10,7 +10,7 @@ snippet snips "show snippets"
    8. orderedset -> pbds
    9. combinations -> nCr
    10. dijkstra -> dijkstra
-   11. unionfind -> UnionFind
+   11. DSU -> UnionFind
  */
 endsnippet
 snippet normal "normal"
@@ -36,7 +36,7 @@ typedef unsigned long long ull;
 #define vpi vector<pii>
 #define all(x) x.begin(),x.end()
 #define ALL(x) x.rbegin(),x.rend()
-#define rep(x,n) for (int i = x; i <x+n; i++)
+#define rep(i,x,n) for (int i = x; i <x+n; i++)
 const int mod = 1e9 + 7, inf = LONG_LONG_MAX, N = 1e6 + 7, MAX = 1e14 + 4;
 
 template<class T, class V>istream& operator>>(istream &in, pair<T, V> &a) {in >> a.first >> a.second; return in;}
@@ -328,32 +328,28 @@ vector<int>dikstra(vector<vector<pii>>&graph, int source, int n) {
 	return dist;
 }
 endsnippet
-snippet unionfind "Union Find"
-class UnionFind {
-	vector<int> root, rank;
+snippet DSU "Union Find"
+class DSU{
+	std::vector<int>par,size;
 	public:
-	UnionFind(int n) : root(n), rank(n) {
-		rank.assign(n, 1);
-		iota(root.begin(), root.end(), 0);
+	DSU(int n):par(n+5),size(n+5){
+		for(int i=1;i<=n;i++) size[i]=1,par[i]=i;
 	}
-
-	int Find(int x) {
-		if (x == root[x])
-			return x;
-		else
-			return root[x] = Find(root[x]);
+	int parent(int x){
+		return (par[x]==x?x:parent(par[x]));
 	}
-
-	void Union(int x, int y) {
-		int rX = Find(x), rY = Find(y);
-		if (rX == rY)
-			return;
-		if (rank[rX] > rank[rY])
-			swap(rX, rY);
-		root[rX] = rY;
-		if (rank[rX] == rank[rY])
-			rank[rY]++;
+	void unite(int x,int y){
+		int rootx=parent(x),rooty=parent(y);
+		if(rootx==rooty) return;
+		if(size[rootx]<size[rooty]) swap(rootx,rooty);
+		par[rooty]=x;
+		size[rootx]+=size[rooty];
 	}
-	bool connected(int x, int y) { return Find(x) == Find(y); }
+	bool connected(int x,int y){
+		return parent(x)==parent(y);
+	}
+	int get_size(int x){
+		return size[x];
+	}
 };
 endsnippet
