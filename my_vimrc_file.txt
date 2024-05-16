@@ -1,7 +1,3 @@
-"" Vim Script
-"colorscheme abscs
-"set exrc
-"packadd! monokai-phoenix
 syntax enable
 colorscheme monokai-phoenix
 set guioptions+=a
@@ -15,41 +11,20 @@ vnoremap <F1> <ESC>:tabprev <CR>
 inoremap <F1> <ESC>
 noremap <F3> <ESC> :w <CR> :make <CR>
 inoremap <F3> <ESC> :w <CR> :make <CR>
-"noremap <F4> <ESC> :w <CR> :!pycodestyle %<.py <CR>
-"inoremap <F4> <ESC> :w <CR> :!pycodestyle %<.py <CR>
-
-"noremap <F5> <ESC> :w <CR> :!pytest %<.py <CR>
-"inoremap <F5> <ESC> :w <CR> :!pytest %<.py <CR>
-
-"noremap <F6> <ESC> :!./%< < inp<CR>
-"inoremap <F6> <ESC> :!./%< < inp<CR>
-
 noremap <F7> <ESC> :w !python3 <CR>
-"noremap <F7> <ESC> :w <CR> :!avr-gcc -g -std=c99 -O1 -mmcu=atmega328p -o out.elf example.c<CR>
-"noremap <F6> <ESC> :w <CR> :!avrdude -v -patmega328p -P /dev/cu.usbmodem14* -c arduino -U flash:w:"out.elf"<CR>
-"noremap <F5> <ESC> :w <CR> :!avrdude -v -patmega328p -P /dev/cu.usbmodemHID* -c arduino -U flash:w:"out.elf"<CR>
-
 noremap <C-f> G31
 "   ---> error for -fsanitize=address   <------
 "noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
 "inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++20 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=address -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
 
-" -pthread
-noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
-inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o %< % && ./%<<CR>
+noremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23  -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o  %< % && ./%<<CR>
+inoremap <F9> <ESC> :w <CR> :!g++ -std=gnu++23 -O3 -DDEBUG -DONPC -g -fsanitize=signed-integer-overflow -fsanitize=bounds-strict -fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero -fsanitize=pointer-overflow -fsanitize=shift-exponent -fsplit-stack -Wshadow -Wall -fconcepts -o  %< % && ./%<<CR>
 
 noremap <F8> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
 inoremap <F8> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
 
-"noremap <F10> <ESC> :w <CR> :!clang++ -fsanitize=address -std=c++17 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
-"inoremap <F10> <ESC> :w <CR> :!clang++ -fsanitize=address -std=c++17 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< <CR>
-
-
 noremap <F10> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o %< % && ./%< < inp<CR>
 inoremap <F10> <ESC> :w <CR> :!g++ -fsanitize=address -std=c++20 -Wall -Wextra -Wshadow -DONPC -O2 -o "%<" "%" && "./%<" < inp<CR>
-
-
-"inoremap {<CR> {<CR>}<ESC>k$A<CR>
 noremap <TAB> %
 call plug#begin('~/.vim/plugged')
 
@@ -64,20 +39,8 @@ Plug 'sirver/ultisnips'
 let g:UltiSnipsExpandTrigger = '<tab>'
 let g:UltiSnipsJumpForwardTrigger = '<tab>'
 let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
-"let g:UltiSnipsJumpForwardTrigger="<c-b>"
-"let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-"let g:UltiSnipsEditSplit="vertical"
-
 Plug 'honza/vim-snippets'
-
-Plug 'sbdchd/neoformat'
-let g:neoformat_try_node_exe = 1
-autocmd BufWritePre,TextChanged,InsertLeave *.js Neoformat
-
-
 Plug 'searleser97/cpbooster.vim'
-"Plug 'gilligan/vim-lldb'
-"themes
 Plug 'Abstract-IDE/Abstract-cs'
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'martinsione/darkplus.nvim'
@@ -86,14 +49,28 @@ call plug#end()
 ":PlugInstall
 
 
+au FileType c,cpp,java setlocal equalprg=astyle
+function! Format()
+    silent! execute 'norm! mz'
 
+    if &ft ==? 'c' || &ft ==? 'cpp' || &ft ==? 'php'
+        set formatprg=astyle\ --mode=c
+        silent! execute 'norm! gggqG'
+    elseif &ft ==? 'java'
+        set formatprg=astyle\ --mode=java
+        silent! execute 'norm! gggqG'
+    endif
 
-let c_syntax_for_h=""
-
-let g:netrw_keepdir = 0
-
-let g:netrw_localrmdir='rm -r'
-
+    silent! call RemoveTrailingSpaces()
+    silent! execute 'retab'
+    silent! execute 'gg=G'
+    silent! execute 'norm! `z'
+    set formatprg=
+endfunction
+function! RemoveTrailingSpaces()
+    silent! execute '%s/\s\+$//ge'
+    silent! execute 'g/\v^$\n*%$/norm! dd'
+endfunction
 let mapleader = "\<Space>"
 noremap <Leader>b ^
 noremap <Leader>e <ESC>:e .<CR>
@@ -112,8 +89,6 @@ noremap <Leader>s :source ~/.vimrc <CR>
 command! Prog :e ~/Documents/programming/
 command! SP :e ~/Documents/SPBU_SP_6_term/
 command! Kek source ~/.vimrc
-"autocmd FocusLost * redraw!
-"command! LLDB :!clang++ -fsanitize=address -std=c++17 -O0 -g -o "%<" "%" && lldb %<
 command! Gdb !g++ -std=c++17 -O0 -g -o %< 
 
 
