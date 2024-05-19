@@ -1,7 +1,8 @@
 " Enable syntax highlighting and set color scheme to Monokai Phoenix
 syntax enable
-colorscheme monokai-phoenix
-
+"colorscheme monokai-phoenix
+colorscheme monokai_pro
+set termguicolors
 " Set GUI options to include the 'a' flag
 set guioptions+=a
 
@@ -55,6 +56,9 @@ let g:vimtex_view_method='general'
 let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
+
+Plug 'ayu-theme/ayu-vim' " 
+let ayucolor="dark"   " for dark version of theme
 
 Plug 'sirver/ultisnips'
 let g:UltiSnipsExpandTrigger = '<tab>'
