@@ -8,8 +8,14 @@ set guioptions+=a
 
 " Custom key mappings for copying and pasting
 
-vnoremap <C-c> "+y
+" Copy to clipboard in normal mode
 nnoremap <C-c> "+y
+
+" Copy to clipboard in visual mode
+vnoremap <C-c> "+y
+
+" Copy to clipboard in insert mode
+inoremap <C-c> <C-o>"+y
 
 nnoremap <C-p> "+p
 vnoremap <C-p> "+p
