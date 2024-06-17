@@ -31,7 +31,10 @@
 
 # 
 # Attach brackets to a class statement. This is done regardless of the bracket style being used.
-# 
+#
+
+
+
 --attach-classes
 
 # 
@@ -129,7 +132,7 @@
 #
 # Insert space padding around parenthesis on the outside only. Parentheses that are empty will not be padded. 
 #
-# --pad-paren-out
+ --pad-paren-out
 
 #
 # Insert space padding around the first parenthesis in a series on the outside only. 
@@ -240,7 +243,7 @@
 # By default logical conditionals will be placed first on the new line. 
 # The option break?after?logical will cause the logical conditionals to be placed last on the previous line. This option has no effect without max?code?length.
 #
---max-code-length=100
+--max-code-length=120
 #
 # Indent a C type, C#, or Java file. C type files are C, C++, C++/CLI, and Objective-C.  The option is usually set from the file extension for each file. 
 #
