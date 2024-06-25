@@ -505,7 +505,7 @@ class Graph {
         adj[u].push_back (v);
         adj[v].push_back (u);
     }
-    const vector<vector<T>> &getAdjacencyList() const {
+    const vector<vector<T>> &get() const {
         return adj;
     }
   private:
