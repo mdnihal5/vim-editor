@@ -169,109 +169,110 @@ struct SegmentTree {
 };
 endsnippet
 snippet lazysegtree "lazysegmenttree"
-template<typename T>
-class LazySegmentTree {
-  private:
-    vector<T> tree, lazy;
-    vector<T> nums;
+template <typename T, typename U>
+struct SegTree {
+    struct Node {
+        T val = T();
+        U lazy = U();
+
+        void apply (int l, int r, const U &upd) {
+            val += upd * (r - l + 1);
+            lazy += upd;
+        }
+    };
+
     int n;
-    T identity;
+    std::vector<Node> seg;
 
-    bool isValid (int idx) {
-        return idx >= 0 && idx < n;
+    Node merge (const Node &a, const Node &b) const {
+        Node res;
+        res.val = a.val + b.val;
+        return res;
     }
 
-    T combine (T left, T right) {
-        return left + right; // Change this for different operations
-    }
-
-    void apply (T &a, T b, int length) {
-        a += b * length; // Change this for different operations
-    }
-
-    void build (int node, int start, int end) {
-        if (start == end) {
-            tree[node] = nums[start];
-
-        } else {
-            int mid = start + (end - start) / 2;
-            build (2 * node, start, mid);
-            build (2 * node + 1, mid + 1, end);
-            tree[node] = combine (tree[2 * node], tree[2 * node + 1]);
+    void push (int l, int r, int pos) {
+        if (seg[pos].lazy != U() ) {
+            int mid = (l + r) / 2;
+            seg[pos * 2].apply (l, mid, seg[pos].lazy);
+            seg[pos * 2 + 1].apply (mid + 1, r, seg[pos].lazy);
+            seg[pos].lazy = U();
         }
     }
 
-    void push (int node, int start, int end) {
-        if (lazy[node] != identity) {
-            apply (tree[node], lazy[node], end - start + 1);
+    void build (int l, int r, int pos) {
+        if (l == r) return;
 
-            if (start != end) {
-                lazy[2 * node] = combine (lazy[2 * node], lazy[node]);
-                lazy[2 * node + 1] = combine (lazy[2 * node + 1], lazy[node]);
-            }
-
-            lazy[node] = identity;
-        }
+        int mid = (l + r) / 2;
+        build (l, mid, pos * 2);
+        build (mid + 1, r, pos * 2 + 1);
+        pull (pos);
     }
 
-    void updateRange (int node, int start, int end, int l, int r, T val) {
-        push (node, start, end);
-
-        if (r < start || end < l) {
+    template <typename V>
+    void build (int l, int r, int pos, const std::vector<V> &v) {
+        if (l == r) {
+            seg[pos].apply (l, r, v[l]);
             return;
         }
 
-        if (l <= start && end <= r) {
-            lazy[node] = combine (lazy[node], val);
-            push (node, start, end);
+        int mid = (l + r) / 2;
+        build (l, mid, pos * 2, v);
+        build (mid + 1, r, pos * 2 + 1, v);
+        pull (pos);
+    }
+
+    void pull (int pos) {
+        seg[pos] = merge (seg[pos * 2], seg[pos * 2 + 1]);
+    }
+
+    Node query (int l, int r, int pos, int ql, int qr) {
+        push (l, r, pos);
+
+        if (l > qr || r < ql) return Node();
+
+        if (l >= ql && r <= qr) return seg[pos];
+
+        int mid = (l + r) / 2;
+        return merge (query (l, mid, pos * 2, ql, qr), query (mid + 1, r, pos * 2 + 1, ql, qr) );
+    }
+
+    void modify (int l, int r, int pos, int ql, int qr, const U &v) {
+        push (l, r, pos);
+
+        if (l > qr || r < ql) return;
+
+        if (l >= ql && r <= qr) {
+            seg[pos].apply (l, r, v);
             return;
         }
 
-        int mid = start + (end - start) / 2;
-        updateRange (2 * node, start, mid, l, r, val);
-        updateRange (2 * node + 1, mid + 1, end, l, r, val);
-        tree[node] = combine (tree[2 * node], tree[2 * node + 1]);
+        int mid = (l + r) / 2;
+        modify (l, mid, pos * 2, ql, qr, v);
+        modify (mid + 1, r, pos * 2 + 1, ql, qr, v);
+        pull (pos);
     }
 
-    T queryRange (int node, int start, int end, int l, int r) {
-        push (node, start, end);
-
-        if (r < start || end < l) {
-            return identity;
-        }
-
-        if (l <= start && end <= r) {
-            return tree[node];
-        }
-
-        int mid = start + (end - start) / 2;
-        T leftResult = queryRange (2 * node, start, mid, l, r);
-        T rightResult = queryRange (2 * node + 1, mid + 1, end, l, r);
-        return combine (leftResult, rightResult);
+    SegTree (int _n) : n (_n) {
+        seg.resize (4 * n + 1);
+        build (1, n, 1);
     }
 
-  public:
-    LazySegmentTree (const vector<T> &nums, T identity) : nums (nums), identity (identity) {
-        n = nums.size();
-        tree.resize (4 * n, identity);
-        lazy.resize (4 * n, identity);
-        build (1, 0, n - 1);
+    template <typename V>
+    SegTree (int _n, const std::vector<V> &v) : n (_n) {
+        seg.resize (4 * n + 1);
+        build (1, n, 1, v);
     }
 
-    LazySegmentTree (int size, T identity) : identity (identity) {
-        n = size;
-        nums.resize (n, identity);
-        tree.resize (4 * n, identity);
-        lazy.resize (4 * n, identity);
-        build (1, 0, n - 1);
+    Node query (int l, int r) {
+        return query (1, n, 1, l, r);
     }
 
-    void updateRange (int l, int r, T val) {
-        updateRange (1, 0, n - 1, l, r, val);
+    Node query (int x) {
+        return query (1, n, 1, x, x);
     }
 
-    T queryRange (int l, int r) {
-        return queryRange (1, 0, n - 1, l, r);
+    void modify (int ql, int qr, const U &v) {
+        modify (1, n, 1, ql, qr, v);
     }
 };
 endsnippet
@@ -515,45 +516,58 @@ class Zalgo {
 };
 endsnippet
 snippet StringHash "string hashing"
-class StringHash {
-  public:
-    const int base = 31;
-    const int mod = 1e9 + 9;
-    std::vector<int> hash;
-    std::vector<int> power;
+#define MAXLEN 1000010
+constexpr uint64_t prime = (1ULL << 61) - 1;
+const uint64_t seed = chrono::system_clock::now().time_since_epoch().count();
+const uint64_t base = mt19937_64 (seed) () % (prime / 3) + (prime / 3);
+uint64_t base_pow[MAXLEN];
+int64_t primemul (uint64_t a, uint64_t b) {
+    uint64_t l1 = (uint32_t) a, h1 = a >> 32, l2 = (uint32_t) b, h2 = b >> 32;
+    uint64_t l = l1 * l2, m = l1 * h2 + l2 * h1, h = h1 * h2;
+    uint64_t ret = (l & prime) + (l >> 61) + (h << 3) + (m >> 29) + (m << 35 >> 3) + 1;
+    ret = (ret & prime) + (ret >> 61);
+    ret = (ret & prime) + (ret >> 61);
+    return ret - 1;
+}
+void init() {
+    base_pow[0] = 1;
 
-    StringHash (const std::string &s) {
-        int n = s.size();
-        hash.resize (n + 1);
-        power.resize (n + 1);
-        hash[0] = 0;
-        power[0] = 1;
+    for (int i = 1; i < MAXLEN; i++) {
+        base_pow[i] = primemul (base_pow[i - 1], base);
+    }
+}
+struct PolyHash {
+    /// Remove suff vector and usage if reverse hash is not required for more speed
+    vector<int64_t> pref;
 
-        for (int i = 1; i <= n; ++i) {
-            hash[i] = (1LL * hash[i - 1] * base + (s[i - 1] - 'a' + 1) ) % mod;
-            power[i] = 1LL * power[i - 1] * base % mod;
+    PolyHash() {}
+
+    template <typename T>
+    PolyHash (const vector<T> &ar) {
+        if (!base_pow[0]) init();
+
+        int n = ar.size();
+        assert (n < MAXLEN);
+        pref.resize (n + 3, 0);
+
+        for (int i = 1; i <= n; i++) {
+            pref[i] = primemul (pref[i - 1], base) + ar[i - 1] + 997;
+
+            if (pref[i] >= prime) pref[i] -= prime;
         }
     }
+    PolyHash (const string &str)
+        : PolyHash (vector<char> (str.begin(), str.end() ) ) {}
 
-    int getHash (int l, int r) const {
-        int result = (hash[r] - 1LL * hash[l - 1] * power[r - l + 1] % mod + mod) % mod;
-        return result;
+    uint64_t hash (int l, int r) {
+        int64_t h = pref[r + 1] - primemul (base_pow[r - l + 1], pref[l]);
+        return h < 0 ? h + prime : h;
     }
 
-    int HashString() const {
-        return hash[hash.size() - 1];
+    uint64_t combine (uint64_t hash1, uint64_t hash2, int len2) {
+        return (primemul (hash1, base_pow[len2]) + hash2) % prime;
     }
 
-    int combineHashes (int hash1, int hash2, int len2) const {
-        return (1LL * hash1 * power[len2] % mod + hash2) % mod;
-    }
-
-    bool isEqual (const std::string &s1, int l1, int r1, const std::string &s2, int l2, int r2) const {
-        if (r1 - l1 != r2 - l2)
-            return false;
-
-        return getHash (l1, r1) == getHash (l2, r2);
-    }
 };
 
 endsnippet
@@ -599,10 +613,10 @@ struct ModIntBase {
     constexpr ModIntBase operator-() const { return ModIntBase{norm (P - x) }; }
     constexpr ModIntBase inv() const { return power (*this, P - 2); }
 
-    constexpr ModIntBase &operator*= (const ModIntBase &rhs) & { return x = mulMod<P> (x, rhs.x), *this; }
-    constexpr ModIntBase &operator+= (const ModIntBase &rhs) & { return x = norm (x + rhs.x), *this; }
-    constexpr ModIntBase &operator-= (const ModIntBase &rhs) & { return x = norm (x - rhs.x), *this; }
-    constexpr ModIntBase &operator/= (const ModIntBase &rhs) & { return *this *= rhs.inv(); }
+    constexpr ModIntBase &operator*= (const ModIntBase &rhs)& { return x = mulMod<P> (x, rhs.x), *this; }
+    constexpr ModIntBase &operator+= (const ModIntBase &rhs)& { return x = norm (x + rhs.x), *this; }
+    constexpr ModIntBase &operator-= (const ModIntBase &rhs)& { return x = norm (x - rhs.x), *this; }
+    constexpr ModIntBase &operator/= (const ModIntBase &rhs)& { return *this *= rhs.inv(); }
 
     friend constexpr ModIntBase operator* (ModIntBase lhs, const ModIntBase &rhs) { return lhs *= rhs; }
     friend constexpr ModIntBase operator+ (ModIntBase lhs, const ModIntBase &rhs) { return lhs += rhs; }
@@ -679,4 +693,75 @@ using Mint = ModInt<mod>;
  * cout<<power(a,3);
  * assert(a*inverse(a)==1)
  */
+endsnippet
+snippet Blift "binary lifting"
+struct BinaryLift {
+    int n, lg;
+    vector<int> depth;
+    vector<vector<int>> adj, up;
+    BinaryLift (int _n) : n (_n), lg (__lg (n - 1) + 1), depth (n), adj (n), up (lg, vector<int> (n, -1) ) {}
+    void addEdge (int u, int v) {
+        adj[u].push_back (v);
+        adj[v].push_back (u);
+    }
+    void init (int r = -1) {
+        if (r == -1) {
+            for (int u = 0; u < n; u++)
+                if (up[0][u] == -1)
+                    dfs (u);
+
+        } else {
+            dfs (r);
+        }
+
+        for (int i = 1; i < lg; i++)
+            for (int j = 0; j < n; j++)
+                if (up[i - 1][j] != -1)
+                    up[i][j] = up[i - 1][up[i - 1][j]];
+    }
+
+    void dfs (int u) {
+        for (int v : adj[u])
+            if (v != up[0][u]) {
+                depth[v] = depth[u] + 1;
+                up[0][v] = u;
+                dfs (v);
+            }
+    }
+
+    int lca (int u, int v) {
+        if (depth[u] < depth[v])
+            swap (u, v);
+
+        for (int i = lg - 1; i >= 0; i--)
+            if (depth[u] - (1 << i) >= depth[v])
+                u = up[i][u];
+
+        if (u == v)
+            return u;
+
+        for (int i = lg - 1; i >= 0; i--)
+            if (up[i][u] != up[i][v]) {
+                u = up[i][u];
+                v = up[i][v];
+            }
+
+        return up[0][u];
+    }
+
+    int dist (int u, int v) {
+        return depth[u] + depth[v] - 2 * depth[lca (u, v)];
+    }
+
+    int kthAnc (int u, int k) {
+        if (k > depth[u])
+            return -1;
+
+        for (int i = 0; i < lg; i++)
+            if (k >> i & 1)
+                u = up[i][u];
+
+        return u;
+    }
+};
 endsnippet
