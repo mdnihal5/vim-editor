@@ -69,13 +69,19 @@ endfunction
 let g:common_flags = '-std=gnu++23 -Wall -Wextra -Wshadow -DONPC'
 
 " Key mappings for compiling C++ code with different sanitizer options
+" Key mappings for compiling and running C++ code with custom sanitizers
 nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', 10, '')<CR>
 inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', 10, '')<CR>
 
 " Key mappings for compiling and running C++ code with AddressSanitizer
-nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
-inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
+nnoremap <F8> :call ClearOutput()<CR>:call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
+inoremap <F8> <ESC>:call ClearOutput()<CR>:call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
 
+" Function to clear output
+function! ClearOutput()
+  " Adjust the following command according to how you handle output clearing
+  :silent !clear
+endfunction
 " Key mappings for compiling and running C++ code with AddressSanitizer and redirecting input from a file
 nnoremap <F10> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
 inoremap <F10> <ESC> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
