@@ -2,9 +2,12 @@
 syntax enable
 "colorscheme monokai-phoenix
 colorscheme monokai_pro
+set relativenumber
 set termguicolors
 " Set GUI options to include the 'a' flag
 set guioptions+=a
+" Enable system clipboard support for copying and pasting
+set clipboard=unnamedplus
 
 " Custom key mappings for copying and pasting
 
@@ -14,11 +17,21 @@ nnoremap <C-c> "+y
 " Copy to clipboard in visual mode
 vnoremap <C-c> "+y
 
-" Copy to clipboard in insert mode
-inoremap <C-c> <C-o>"+y
+" Copy to clipboard in insert mode (copies the current line)
+inoremap <C-c> <C-o>"+yy
 
+" Paste from clipboard in normal mode
 nnoremap <C-p> "+p
+
+" Paste from clipboard in visual mode (replaces the selected text)
 vnoremap <C-p> "+p
+
+" Paste from clipboard in insert mode
+inoremap <C-p> <C-r><C-o>+
+
+" Enable mouse support in all modes
+set mouse=a
+
 " Map Ctrl-F to trigger the Format() function in normal mode
 nnoremap <C-f> :call Format()<CR>
 
@@ -63,7 +76,7 @@ let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
 
-Plug 'ayu-theme/ayu-vim' " 
+Plug 'ayu-theme/ayu-vim' "
 let ayucolor="dark"   " for dark version of theme
 
 Plug 'sirver/ultisnips'
@@ -112,6 +125,7 @@ function! FormatAndCopyToClipboard()
     normal ggVG
     normal "+y
     call setpos('.', save_cursor)
+    write
 endfunction
 
 " Map Ctrl+A to execute the custom function in normal mode
@@ -119,7 +133,6 @@ nnoremap <C-a> :call FormatAndCopyToClipboard()<CR>
 
 " Map Ctrl+A to execute the custom function in insert mode
 inoremap <C-a> <C-o>:call FormatAndCopyToClipboard()<CR>
-
 
 " Leader key mapping for common actions
 let mapleader = "\<Space>"
