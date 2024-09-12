@@ -7,7 +7,7 @@ set termguicolors
 " Set GUI options to include the 'a' flag
 set guioptions+=a
 " Enable system clipboard support for copying and pasting
-set clipboard=unnamedplus
+"set clipboard=unnamedplus
 
 " Custom key mappings for copying and pasting
 
@@ -54,9 +54,10 @@ inoremap <F3> <ESC> :w <CR> :make <CR>
 noremap <F7> <ESC> :w !python3 <CR>
 " Key mappings for compiling C++ code with different sanitizer options
 " Utility function to compile and run C++ code with given flags, timeout, and optional input redirection
-function! CompileAndRun(flags, timeout, input)
+" Utility function to compile and run C++ code with given flags and optional input redirection
+function! CompileAndRun(flags, input)
     execute 'w'
-    let l:cmd = 'timeout ' . a:timeout . 's g++ ' . a:flags . ' -o %< %'
+    let l:cmd = 'g++ ' . a:flags . ' -o %< %'
     if !empty(a:input)
         let l:cmd .= ' && ./%< < ' . a:input
     else
@@ -68,14 +69,13 @@ endfunction
 " Common compilation flags
 let g:common_flags = '-std=gnu++23 -Wall -Wextra -Wshadow -DONPC'
 
-" Key mappings for compiling C++ code with different sanitizer options
-" Key mappings for compiling and running C++ code with custom sanitizers
-nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', 10, '')<CR>
-inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', 10, '')<CR>
+" Key mappings for compiling C++ code with sanitizers
+nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '')<CR>
+inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '')<CR>
 
-" Key mappings for compiling and running C++ code with AddressSanitizer
-nnoremap <F8> :call ClearOutput()<CR>:call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
-inoremap <F8> <ESC>:call ClearOutput()<CR>:call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, '')<CR>
+" F8 now does the same as F9 but without sanitizers
+nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '')<CR>
+inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '')<CR>
 
 " Function to clear output
 function! ClearOutput()
