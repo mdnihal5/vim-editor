@@ -55,9 +55,13 @@ noremap <F7> <ESC> :w !python3 <CR>
 " Key mappings for compiling C++ code with different sanitizer options
 " Utility function to compile and run C++ code with given flags, timeout, and optional input redirection
 " Utility function to compile and run C++ code with given flags and optional input redirection
-function! CompileAndRun(flags, input)
+function! CompileAndRun(flags, input, clear_output)
     execute 'w'
-    let l:cmd = 'g++ ' . a:flags . ' -o %< %'
+    let l:cmd = ''
+    if a:clear_output
+        let l:cmd .= 'clear && '
+    endif
+    let l:cmd .= 'g++ ' . a:flags . ' -o %< %'
     if !empty(a:input)
         let l:cmd .= ' && ./%< < ' . a:input
     else
@@ -69,13 +73,13 @@ endfunction
 " Common compilation flags
 let g:common_flags = '-std=gnu++23 -Wall -Wextra -Wshadow -DONPC'
 
-" Key mappings for compiling C++ code with sanitizers
-nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '')<CR>
-inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '')<CR>
+" Key mappings for compiling C++ code with sanitizers (no output clearing)
+nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0)<CR>
+inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0)<CR>
 
-" F8 now does the same as F9 but without sanitizers
-nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '')<CR>
-inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '')<CR>
+" F8 clears the terminal output before compiling and running (with output clearing)
+nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1)<CR>
+inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1)<CR>
 
 " Function to clear output
 function! ClearOutput()
