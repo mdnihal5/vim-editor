@@ -699,7 +699,7 @@ struct BinaryLift {
     int n, lg;
     vector<int> depth;
     vector<vector<int>> adj, up;
-    BinaryLift (int _n) : n (_n), lg (__lg (n - 1) + 1), depth (n), adj (n), up (lg, vector<int> (n, -1) ) {}
+    BinaryLift (int _n) : n (_n), lg (__lg (n - 1) + 1), depth (n), adj (n), up (lg, vector<int> (n, 0) ) {}
     void addEdge (int u, int v) {
         adj[u].push_back (v);
         adj[v].push_back (u);
@@ -845,4 +845,124 @@ struct RMQ {
         return min (spt[k][i], spt[k][j - (1 << k) + 1]);
     }
 };
+endsnippet
+snippet Dsegtree "dynamic"
+struct DynamicMaxSubarraySum {
+    struct node {
+        int pref, suf, val, sum;
+    };
+    int N;
+    int neutral;
+    vector<node> t;
+    DynamicMaxSubarraySum (int _N, int assign_value) {
+        neutral = assign_value;
+        N = _N;
+        t.resize (4 * N);
+
+        for (int i = 0; i < 4 * N; i++) t[i] = {0, 0, 0, 0};
+
+        build (1, 0, N - 1);
+    }
+    void build (int i, int l, int r) {
+        if (l == r) {
+            t[i].pref = t[i].suf = t[i].val = t[i].sum = neutral;
+            return;
+        }
+
+        int mid = (l + r) >> 1;
+        build (2 * i, l, mid);
+        build (2 * i + 1, mid + 1, r);
+        t[i] = merge (t[2 * i], t[2 * i + 1]);
+    }
+    node merge (node a, node b) {
+        node c;
+        c.pref = max (a.pref, a.sum + b.pref);
+        c.suf = max (b.suf, b.sum + a.suf);
+        c.val = max ({a.val, b.val, a.suf + b.pref});
+        c.sum = a.sum + b.sum;
+        return c;
+    }
+
+    void modif (int i, int l, int r, int pos, int val) {
+        if (l > pos || r < pos) return;
+
+        if (l == pos && r == pos) {
+            t[i].pref = t[i].suf = t[i].val = t[i].sum = val;
+            return;
+        }
+
+        int mid = (l + r) >> 1;
+        modif (2 * i, l, mid, pos, val);
+        modif (2 * i + 1, mid + 1, r, pos, val);
+        t[i] = merge (t[2 * i], t[2 * i + 1]);
+    }
+    node query (int i, int l, int r, int tl, int tr) {
+        if (l > tr || r < tl) return {0, 0, 0, 0};
+
+        if (l >= tl && r <= tr) return t[i];
+
+        int mid = (l + r) >> 1;
+        return merge (query (2 * i, l, mid, tl, tr), query (2 * i + 1, mid + 1, r, tl, tr) );
+    }
+
+    void modify (int pos, int val) {
+        modif (1, 0, N - 1, pos, val);
+    }
+    node query (int l, int r) {
+        return query (1, 0, N - 1, l, r);
+    }
+    node query (int pos) {
+        return query (1, 0, N - 1, pos, pos);
+    }
+};
+endsnippet
+snippet Minstack "minstack"
+class MinStack {
+  public:
+    std::stack<std::pair<int, int>> st;
+    void push (int x) {
+        int current_min = st.empty() ? x : std::min (x, st.top().second);
+        st.push ({x, current_min});
+    }
+    void pop() {if (!st.empty() ) st.pop(); }
+    int top() const { return st.top().first; }
+    int getMin() const { return st.top().second; }
+    bool empty() const { return st.empty(); }
+    int size() const { return st.size(); }
+    void swap (MinStack &other) {
+        st.swap (other.st);
+    }
+};
+endsnippet
+snippet Mindeque "mindeque"
+class MinDeque {
+  public:
+    MinStack l, r, t;
+    void rebalance() {
+        if (r.empty() ) l.swap (r);
+
+        for (int sz = r.size() / 2; sz--; r.pop() ) t.push (r.top() );
+
+        while (!r.empty() ) l.push (r.top() ), r.pop();
+
+        while (!t.empty() ) r.push (t.top() ), t.pop();
+    }
+    int getMin() {
+        if (l.empty() ) return r.getMin();
+
+        if (r.empty() ) return l.getMin();
+
+        return std::min (l.getMin(), r.getMin() );
+    }
+    bool empty() { return l.empty() && r.empty(); }
+    int size() { return l.size() + r.size(); }
+    void push_front (int x) { l.push (x); }
+    void push_back (int x) { r.push (x); }
+    void pop_front() { if (l.empty() ) rebalance(); l.pop(); }
+    void pop_back() { if (r.empty() ) rebalance(); r.pop(); }
+    int front() { if (l.empty() ) rebalance(); return l.top(); }
+    int back() { if (r.empty() ) rebalance(); return r.top(); }
+    void swap (MinDeque &x) { l.swap (x.l), r.swap (x.r); }
+};
+
 endsnippet
