@@ -1,0 +1,63 @@
+# Step 1: Set Up an Alias (Optional)
+
+# Open your shell configuration file (e.g., .bashrc or .zshrc):
+vim ~/.bashrc  # or ~/.zshrc for zsh
+
+# Add the following alias:
+alias cpprun='g++ -std=gnu++23 -Wall -Wextra -Wshadow -DONPC -o a.out && ./a.out < input.txt > output.txt'
+
+# Save and exit, then reload the configuration:
+source ~/.bashrc  # or source ~/.zshrc
+
+
+" Step 2: Open your Vim configuration file
+vim ~/.vimrc
+
+" ===================================================================
+" Function: CompileAndRun
+" Purpose: Compile and run the current C++ file with optional input and output redirection.
+" Parameters:
+"   - flags: Compilation flags to pass to g++.
+"   - input: Input file name (for redirection), or empty if no redirection.
+"   - output: Output file name (for redirection), or empty if no redirection.
+"   - clear_output: Whether to clear the terminal before running the program (1 = clear, 0 = no clear).
+" ===================================================================
+function! CompileAndRun(flags, input, output, clear_output)
+    " Save the current file before compiling
+    execute 'w'
+
+    " Prepare the command string
+    let l:cmd = ''
+    if a:clear_output
+        let l:cmd .= 'clear && '
+    endif
+
+    " Compilation command: Compile the current file (% represents the current file name)
+    let l:cmd .= 'g++ ' . a:flags . ' -o %< %'
+
+    " If input/output redirection is needed
+    if !empty(a:input)
+        " Run the compiled executable with input from a:input and output to a:output
+        let l:cmd .= ' && ./%< < ' . a:input . ' > ' . a:output
+    else
+        let l:cmd .= ' && ./%<'
+    endif
+
+    " Execute the command
+    execute '!' . l:cmd
+endfunction
+
+" Common compilation flags
+let g:common_flags = '-std=gnu++23 -Wall -Wextra -Wshadow -DONPC'
+
+" Key mappings for compiling C++ code with sanitizers (no output clearing)
+nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', '', 0)<CR>
+inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', '', 0)<CR>
+
+" F8 clears the terminal output before compiling and running (with output clearing)
+nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', '', 1)<CR>
+inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', '', 1)<CR>
+
+" Key mappings for compiling and running C++ code with AddressSanitizer and redirecting input/output
+nnoremap <F10> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=address', 'input.txt', 'output.txt', 0)<CR>
+inoremap <F10> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=address', 'input.txt', 'output.txt', 0)<CR>
