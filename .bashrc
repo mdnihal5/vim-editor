@@ -83,22 +83,67 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
+# function to create file 
+cpp() {
+    local count=$1
+    local mode=$2
+    
+    if [[ -z $count || -z $mode ]]; then
+        echo "Usage: cpp <count> <mode>"
+        echo "Mode 0: Create files with alphabetic names (A.cpp, B.cpp, ...)"
+        echo "Mode 1: Create files with numeric names (1.cpp, 2.cpp, ...)"
+        return 1
+    fi
 
+    if ! [[ $count =~ ^[0-9]+$ ]]; then
+        echo "Error: <count> must be a positive integer."
+        return 1
+    fi
+
+    if [[ $mode -eq 0 ]]; then
+        for ((i=0; i<count; i++)); do
+            filename=$(printf "%c.cpp" $((65 + i)))  # 65 is ASCII for 'A'
+            touch "$filename"
+        done
+    elif [[ $mode -eq 1 ]]; then
+        for ((i=1; i<=count; i++)); do
+            touch "$i.cpp"
+        done
+    else
+        echo "Invalid mode. Use 0 for alphabetic filenames, 1 for numeric filenames."
+        return 1
+    fi
+}
 # colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias proxys='sudo mv apt.conf /etc/apt/'
 alias cstart='cd /home/anonymous/contest/ && vim A.cpp'
-alias proxyr='sudo mv /etc/apt/apt.conf /home/anonymous'
 alias leetcode='cd /home/anonymous/contest && vim leetcode.txt'
 alias cpprun='g++ -std=gnu++23 -Wall -Wextra -Wshadow -DONPC -o a.out && ./a.out < input.txt > output.txt'
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+# Set proxy and move apt.conf to /etc/apt/
+alias setproxy='sudo mv apt.conf /etc/apt/ && \
+export http_proxy="http://rnla130232:502321@staffnet.rgukt.ac.in:328" && \
+export https_proxy="http://rnla130232:502321@staffnet.rgukt.ac.in:328" && \
+npm config set proxy "http://rnla130232:502321@staffnet.rgukt.ac.in:328" && \
+npm config set https-proxy "http://rnla130232:502321@staffnet.rgukt.ac.in:328" && \
+git config --global http.proxy "http://rnla130232:502321@staffnet.rgukt.ac.in:328" && \
+git config --global https.proxy "http://rnla130232:502321@staffnet.rgukt.ac.in:328"'
+
+# Unset proxy and move apt.conf back to home directory
+alias unsetproxy='sudo mv /etc/apt/apt.conf /home/anonymous && \
+unset http_proxy && \
+unset https_proxy && \
+npm config delete proxy && \
+npm config delete https-proxy && \
+git config --global --unset http.proxy && \
+git config --global --unset https.proxy'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -125,3 +170,5 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+export http_proxy="http://rnla130232:502321@staffnet.rgukt.ac.in:3128"
+export https_proxy="http://rnla130232:502321@staffnet.rgukt.ac.in:3128"
