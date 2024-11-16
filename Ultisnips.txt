@@ -18,7 +18,10 @@ snippet snips "show snippets"
  */
 endsnippet
 snippet normal "normal"
-// Author : md_nihal
+/*
+    Author: md_nihal
+    Created on : `!v strftime("%c")`
+*/
 
 #include "bits/stdc++.h"
 using namespace std;
@@ -60,10 +63,10 @@ using ordered_map = tree<key, value, cmp, rb_tree_tag, tree_order_statistics_nod
 
 /*----------------------------------------------- PBDS ends --------------------------------------------*/
 
-#ifndef ONLINE_JUDGE
-    #include "/home/anonymous/Templates/debug.hpp"
-#else
+#ifndef DEBUG
     #define debug(x...);
+#else
+    #include "/home/anonymous/Templates/debug.hpp"
 #endif
 
 /*=========================================== SOLUTION ===========================================*/
@@ -80,22 +83,41 @@ int32_t  main() {
     Md_Nihal;
     int Testcases = 1;    $1cin >> Testcases;
 
-    for (int i = 0; i < Testcases; i++, ____solve(), cout << endl);
+    for (int i = 1; i <= Testcases; i++) {
+        ____solve();
+    }
+
 }
 endsnippet
-
+snippet quote "facts"
+// don't cheat :)
+// don't take hints or solution from friends or any source, you are fooling yourself
+// your rating is waste if it can't portray your problem solving
+// don't use AI
+// pay attention to constraints and edge cases
+// practice :)
+endsnippet
+snippet random "random number"
+std::mt19937_64 rng (std::chrono::steady_clock::now().time_since_epoch().count() );
+endsnippet
 snippet simple "basic"
+/*
+    Author: md_nihal
+    Created on : `!v strftime("%c")`
+*/
+
 #include "bits/stdc++.h"
 using namespace std;
 #define all(x) x.begin(),x.end()
 #define ALL(x) x.rbegin(),x.rend()
 #define int long long
+#define endl "\n" // remove this for interactive problems
 const int mod = 1E9 + 7, MAX = 1E7 + 7, N = 1E5 + 5, inf = 1E18 ;
 
-#ifndef ONLINE_JUDGE
-    #include "/home/anonymous/Templates/debug.hpp"
-#else
+#ifndef DEBUG
     #define debug(x...);
+#else
+    #include "/home/anonymous/Templates/debug.hpp"
 #endif
 
 /*=========================================== SOLUTION ===========================================*/
@@ -109,15 +131,70 @@ void ____solve() {
 /*============================================= MAIN =============================================*/
 
 int32_t main() {
+    ios_base::sync_with_stdio (0); cin.tie (0); cout.tie (0);
     int Test = 1;  $1cin >> Test;
 
-    for (int i = 0; i < Test; i++, ____solve(), cout << endl);
+    for (int i = 1; i <= Test; i++) {
+        ____solve();
+    }
 }
 
 endsnippet
+snippet Meta "facebook"
+/*
+    Author: md_nihal
+    Created on : `!v strftime("%c")`
+*/
+
+#include "bits/stdc++.h"
+using namespace std;
+#define all(x) x.begin(),x.end()
+#define ALL(x) x.rbegin(),x.rend()
+#define int long long
+const int mod = 1E9 + 7, MAX = 1E7 + 7, N = 1E5 + 5, inf = 1E18 ;
+
+#ifndef DEBUG
+    #define debug(x...);
+#else
+    #include "/home/anonymous/Templates/debug.hpp"
+#endif
+
+/*=========================================== SOLUTION ===========================================*/
+
+void ____solve() {
+
+    $0
+
+}
+
+/*============================================= MAIN =============================================*/
+
+int32_t main() {
+    freopen ("input.txt", "r", stdin);
+    freopen ("output.txt", "w", stdout);
+
+    int Test = 1;  cin >> Test;
+    cout << setprecision (20) << fixed;
+
+    for (int i = 1; i <= Test; i++) {
+        cout << "Case #" << i << ": ";
+        ____solve();
+    }
+
+    return 0;
+}
+endsnippet
 snippet c++ "basic"
+/*
+    Author: md_nihal
+    Created on: `!v strftime("%A %d %B %Y %I:%M:%S %p")`
+*/
+
 #include<bits/stdc++.h>
 using namespace std;
+using ll = long long;
+#define all(x) x.begin(), x.end()
+
 void __solve() {
 
     $0
@@ -168,113 +245,101 @@ struct SegmentTree {
     }
 };
 endsnippet
-snippet lazysegtree "lazysegmenttree"
-template <typename T, typename U>
-struct SegTree {
-    struct Node {
-        T val = T();
-        U lazy = U();
 
-        void apply (int l, int r, const U &upd) {
-            val += upd * (r - l + 1);
-            lazy += upd;
-        }
+snippet lazysegtree "lazysegmenttree"
+template<typename T>
+class LazySegmentTree {
+    struct Node {
+        T x = 0;         // Change based on use case
+        T lazy = 0;          // Lazy x for propagation
+        int count = 1;       // Count of elements (for min/max)
+
+        Node() {}
+        Node (T val) : x (val), lazy (0), count (1) {}
+        Node (T val, T lz, int cnt) : x (val), lazy (lz), count (cnt) {}
     };
 
-    int n;
-    std::vector<Node> seg;
+    std::vector<Node> tree;
+    int size;
 
-    Node merge (const Node &a, const Node &b) const {
-        Node res;
-        res.val = a.val + b.val;
-        return res;
+    Node merge (Node a, Node b) {
+        Node result;
+        result.x = min (a.x, b.x);
+        result.count = (a.x == b.x ? a.count + b.count : a.x > b.x ? b.count : a.count);
+        return result;
     }
 
-    void push (int l, int r, int pos) {
-        if (seg[pos].lazy != U() ) {
-            int mid = (l + r) / 2;
-            seg[pos * 2].apply (l, mid, seg[pos].lazy);
-            seg[pos * 2 + 1].apply (mid + 1, r, seg[pos].lazy);
-            seg[pos].lazy = U();
+    void apply (int idx, T x) {
+        tree[idx].x += x;   // Modify as per operation
+        tree[idx].lazy += x;    // Lazy propagation
+    }
+
+    void propagate (int idx, int left, int right) {
+        if (tree[idx].lazy != 0) {
+            apply (2 * idx + 1, tree[idx].lazy);
+            apply (2 * idx + 2, tree[idx].lazy);
+            tree[idx].lazy = 0;
         }
     }
 
-    void build (int l, int r, int pos) {
-        if (l == r) return;
+    void build (const std::vector<T> &arr, int idx, int left, int right) {
+        if (left == right) {
+            tree[idx] = Node (arr[left]);
 
-        int mid = (l + r) / 2;
-        build (l, mid, pos * 2);
-        build (mid + 1, r, pos * 2 + 1);
-        pull (pos);
+        } else {
+            int mid = (left + right) / 2;
+            build (arr, 2 * idx + 1, left, mid);
+            build (arr, 2 * idx + 2, mid + 1, right);
+            tree[idx] = merge (tree[2 * idx + 1], tree[2 * idx + 2]);
+        }
     }
 
-    template <typename V>
-    void build (int l, int r, int pos, const std::vector<V> &v) {
-        if (l == r) {
-            seg[pos].apply (l, r, v[l]);
+    Node query (int idx, int left, int right, int qLeft, int qRight) {
+        if (qLeft > right || qRight < left) return Node (INT_MAX);
+
+        propagate (idx, left, right);
+
+        if (qLeft <= left && qRight >= right) return tree[idx];
+
+        int mid = (left + right) / 2;
+        return merge (query (2 * idx + 1, left, mid, qLeft, qRight),
+                      query (2 * idx + 2, mid + 1, right, qLeft, qRight) );
+    }
+
+    void update (int idx, int left, int right, int uLeft, int uRight, T x) {
+        if (uLeft > right || uRight < left) return;
+
+        if (uLeft <= left && uRight >= right) {
+            apply (idx, x);
             return;
         }
 
-        int mid = (l + r) / 2;
-        build (l, mid, pos * 2, v);
-        build (mid + 1, r, pos * 2 + 1, v);
-        pull (pos);
+        propagate (idx, left, right);
+        int mid = (left + right) / 2;
+        update (2 * idx + 1, left, mid, uLeft, uRight, x);
+        update (2 * idx + 2, mid + 1, right, uLeft, uRight, x);
+        tree[idx] = merge (tree[2 * idx + 1], tree[2 * idx + 2]);
     }
 
-    void pull (int pos) {
-        seg[pos] = merge (seg[pos * 2], seg[pos * 2 + 1]);
+  public:
+    LazySegmentTree (int n) : size (n) {
+        tree.resize (4 * n);
     }
 
-    Node query (int l, int r, int pos, int ql, int qr) {
-        push (l, r, pos);
-
-        if (l > qr || r < ql) return Node();
-
-        if (l >= ql && r <= qr) return seg[pos];
-
-        int mid = (l + r) / 2;
-        return merge (query (l, mid, pos * 2, ql, qr), query (mid + 1, r, pos * 2 + 1, ql, qr) );
+    void build (const std::vector<T> &arr) {
+        build (arr, 0, 0, size - 1);
     }
 
-    void modify (int l, int r, int pos, int ql, int qr, const U &v) {
-        push (l, r, pos);
-
-        if (l > qr || r < ql) return;
-
-        if (l >= ql && r <= qr) {
-            seg[pos].apply (l, r, v);
-            return;
-        }
-
-        int mid = (l + r) / 2;
-        modify (l, mid, pos * 2, ql, qr, v);
-        modify (mid + 1, r, pos * 2 + 1, ql, qr, v);
-        pull (pos);
+    Node query (int left, int right) {
+        return query (0, 0, size - 1, left, right);
     }
 
-    SegTree (int _n) : n (_n) {
-        seg.resize (4 * n + 1);
-        build (1, n, 1);
-    }
-
-    template <typename V>
-    SegTree (int _n, const std::vector<V> &v) : n (_n) {
-        seg.resize (4 * n + 1);
-        build (1, n, 1, v);
-    }
-
-    Node query (int l, int r) {
-        return query (1, n, 1, l, r);
-    }
-
-    Node query (int x) {
-        return query (1, n, 1, x, x);
-    }
-
-    void modify (int ql, int qr, const U &v) {
-        modify (1, n, 1, ql, qr, v);
+    void update (int left, int right, T x) {
+        update (0, 0, size - 1, left, right, x);
     }
 };
+
+
 endsnippet
 
 snippet primes "prime operations"
@@ -436,15 +501,16 @@ class DSU {
     int parent (int x) {
         return (par[x] == x ? x : parent (par[x]) );
     }
-    void unite (int x, int y) {
+    bool unite (int x, int y) {
         int rootx = parent (x), rooty = parent (y);
 
-        if (rootx == rooty) return;
+        if (rootx == rooty) return false;
 
         if (size[rootx] < size[rooty]) swap (rootx, rooty);
 
         par[rooty] = rootx;
         size[rootx] += size[rooty];
+        return true;
     }
     bool connected (int x, int y) {
         return parent (x) == parent (y);
@@ -641,7 +707,7 @@ using Mint = ModInt<P>;
 
 struct Comb {
     int n = 0;
-    std::vector<Z> _fac{1}, _invfac{1}, _inv{0};
+    std::vector<Mint> _fac{1}, _invfac{1}, _inv{0};
 
     void init (int m) {
         if (m <= n) return;
@@ -964,5 +1030,67 @@ class MinDeque {
     int back() { if (r.empty() ) rebalance(); return r.top(); }
     void swap (MinDeque &x) { l.swap (x.l), r.swap (x.r); }
 };
+endsnippet
+snippet Mo "mos algo"
+struct Query {
+    int l, r, idx;
+    Query (int l_, int r_, int idx_) : l (l_), r (r_), idx (idx_) {}
+    bool operator< (const Query &other) const {
+        static const int B = 450;
+        return make_pair (l / B, r) < make_pair (other.l / B, other.r);
+    }
+};
 
+struct Mo {
+    int n, cnt = 0;
+    vector<int> v, freq;
+    void init (const vector<int> &array) {
+        n = array.size();
+        v = array;
+        freq.assign (n + 1, 0);
+    }
+    void add (int idx) {
+        if (freq[v[idx]] % 2) cnt--;
+
+        freq[v[idx]]++;
+
+        if (freq[v[idx]] % 2) cnt++;
+    }
+
+    void remove (int idx) {
+        if (freq[v[idx]] % 2) cnt--;
+
+        freq[v[idx]]--;
+
+        if (freq[v[idx]] % 2) cnt++;
+
+    }
+
+    int query() const { return cnt; }
+
+    vector<int> start (vector<Query> &queries) {
+        vector<int> answers (queries.size() );
+        sort (queries.begin(), queries.end() );
+
+        int l = 0, r = -1;
+
+        for (const auto &q : queries) {
+            while (l > q.l) add (--l);
+
+            while (r < q.r) add (++r);
+
+            while (r > q.r) remove (r--);
+
+            while (l < q.l) remove (l++);
+
+            answers[q.idx] = query();
+        }
+
+        return answers;
+    }
+};
+// Mo mo
+// mo.init(a)
+// vector<Query>Q; // use emplace back
+// mo.start(Q)
 endsnippet
