@@ -109,28 +109,22 @@ function! CompileAndRun(flags, input, clear_output, output_file)
 endfunction
 
 " Common compilation flags
-let g:common_flags = '-std=gnu++23 -Wall -Wextra -Wshadow -DONPC'
+" Common compilation flags
+let g:common_flags = '-std=c++23 -Wall -Wextra -Wshadow -DONPC'
 
-" Key mappings for compiling C++ code with sanitizers (no output clearing)
-nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0, '')<CR>
-inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0, '')<CR>
+" Key mappings for compiling C++ code with essential sanitizers
+nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
+inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
 
 " F8 clears the terminal output before compiling and running (with output clearing)
 nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 
-" Function to clear output
-function! ClearOutput()
-  " Adjust the following command according to how you handle output clearing
-  :silent !clear
-endfunction
-
-" Key mappings for compiling and running C++ code with input from input.txt and output to output.txt
 " Key mappings for compiling and running C++ code with output to output.txt (no input from file)
-nnoremap <F7> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0, 'output.txt')<CR>
-inoremap <F7> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=signed-integer-overflow,bounds-strict,integer-divide-by-zero,float-divide-by-zero,pointer-overflow,shift-exponent -fsplit-stack -fconcepts', '', 0, 'output.txt')<CR>
+nnoremap <F7> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
+inoremap <F7> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
 
-" Key mappings for compiling and running C++ code with AddressSanitizer and redirecting input from a file
+" Key mappings for compiling and running C++ code with AddressSanitizer (redirecting input from a file)
 nnoremap <F10> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
 inoremap <F10> <ESC> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
 " Initialize Vim plugins
