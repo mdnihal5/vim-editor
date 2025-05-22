@@ -1,6 +1,7 @@
 " Plugin Setup
 call plug#begin('~/.vim/plugged')
 Plug 'joshdick/onedark.vim'
+Plug 'SirVer/ultisnips'  " UltiSnips Plugin
 call plug#end()
 
 " Colorscheme
@@ -14,130 +15,113 @@ set shiftwidth=4
 set expandtab
 set mouse=a
 
-" Enable system clipboard support for copying and pasting
-"set clipboard=unnamedplus
+" Clipboard support (optional)
+set clipboard=unnamedplus
 
 " Key Mappings for Copy-Paste
-nnoremap <C-c> "+y
-vnoremap <C-c> "+y
-inoremap <C-c> <C-o>"+yy
-nnoremap <C-p> "+p
-vnoremap <C-p> "+p
-inoremap <C-p> <C-r><C-o>+
+nnoremap <C-c> "+y            " Copy in normal mode with Ctrl+C
+vnoremap <C-c> "+y            " Copy in visual mode with Ctrl+C
+nnoremap <Space>c "+y         " Copy in normal mode with Space+C
+vnoremap <Space>c "+y         " Copy in visual mode with Space+C
 
-nnoremap <C-a> ggVG"+y
+nnoremap <C-p> "+p            " Paste in normal mode with Ctrl+P
+vnoremap <C-p> "+p            " Paste in visual mode with Ctrl+P
+nnoremap <Space>p "+p         " Paste in normal mode with Space+P
+vnoremap <Space>p "+p         " Paste in visual mode with Space+P
+
+nnoremap <C-a> :call Format()<CR>ggVG"+y
+vnoremap <C-a> :call Format()<CR>ggVG"+y
 
 " Formatting Key Mappings
-nnoremap <C-f> :call Format()<CR>
-inoremap <C-f> <C-o>:call Format()<CR>
+nnoremap <C-f> :call Format()<CR>    " Format in normal mode with Ctrl+F
+vnoremap <C-f> :call Format()<CR>    " Format in visual mode with Ctrl+F
+nnoremap <Space>f :call Format()<CR> " Format in normal mode with Space+F
+vnoremap <Space>f :call Format()<CR> " Format in visual mode with Space+F
 
-" Function to format code and remove trailing spaces
+" Select All and Copy Mappings
+nnoremap <C-r> ggVG               " Select all and copy in normal mode with Ctrl+R
+vnoremap <C-r> ggVG               " Select all and copy in visual mode with Ctrl+R
+nnoremap <Space>a ggVG            " Select all and copy in normal mode with Space+R
+vnoremap <Space>a ggVG            " Select all and copy in visual mode with Space+R
+
+" Function to format code
 function! Format()
-    silent! execute 'norm! mz'
-
-    if &ft ==? 'c' || &ft ==? 'cpp' || &ft ==? 'php'
-        set formatprg=astyle\ --mode=c
-        silent! execute 'norm! gggqG'
-    elseif &ft ==? 'java'
-        set formatprg=astyle\ --mode=java
-        silent! execute 'norm! gggqG'
-    endif
-
-    silent! call RemoveTrailingSpaces()
-    silent! execute 'retab'
-    silent! execute 'gg=G'
-    silent! execute 'norm! `z'
-    set formatprg=
+  silent! execute 'norm! mz'
+  if &ft ==? 'c' || &ft ==? 'cpp' || &ft ==? 'php'
+    set formatprg=astyle\ --mode=c
+    silent! execute 'norm! gggqG'
+  elseif &ft ==? 'java'
+    set formatprg=astyle\ --mode=java
+    silent! execute 'norm! gggqG'
+  endif
+  silent! call RemoveTrailingSpaces()
+  silent! execute 'retab'
+  silent! execute 'gg=G'
+  silent! execute 'norm! `z'
+  set formatprg=
 endfunction
 
-" Function to remove trailing spaces
+" Remove trailing spaces
 function! RemoveTrailingSpaces()
-    silent! execute '%s/\s\+$//ge'
-    silent! execute 'g/\v^$\n*%$/norm! dd'
+  silent! execute '%s/\s\+$//ge'
+  silent! execute 'g/\v^\$\n\*%\$/norm! dd'
 endfunction
 
-" Define a function to format the buffer, select all text, and copy it to the system clipboard
+" Format and copy to clipboard
 function! FormatAndCopyToClipboard()
-    let save_cursor = getpos('.')
-    %!astyle
-    normal ggVG
-    normal "+y
-    call setpos('.', save_cursor)
-    write
+  let save_cursor = getpos('.')
+  %!astyle
+  normal ggVG
+  normal "+y
+  call setpos('.', save_cursor)
+  write
 endfunction
 
-" Comment/Uncomment selected text or line with Ctrl+/
-function! ToggleComment()
-    if mode() ==# 'v'
-        '<,'>s/^/\<C-r>=CommentChar()<CR>/
-    else
-        s/^/\<C-r>=CommentChar()<CR>/
-    endif
-endfunction
 
-" Set the comment character based on file type
-function! CommentChar()
-    if &filetype == 'python' || &filetype == 'sh' || &filetype == 'bash'
-        return '# '
-    elseif &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
-        return '// '
-    elseif &filetype == 'html'
-        return '<!-- '
-    " Add other file types and comment styles as needed
-    else
-        return '# ' " Default to hash if file type is not detected
-    endif
-endfunction
-
-" Map Ctrl + / to toggle comment for normal and visual mode
-nnoremap <C-/> :call ToggleComment()<CR>
-vnoremap <C-/> :call ToggleComment()<CR>
-
-" Map Ctrl+A to copy the entire file to the clipboard without formatting
-nnoremap <C-a> ggVG"+y
-
-" Map Ctrl+A to execute the custom function in insert mode
-inoremap <C-a> <C-o>:call FormatAndCopyToClipboard()<CR>
-
-" Key mappings for compiling C++ code with given flags and optional input redirection
+" Compilation Key Mappings
 function! CompileAndRun(flags, input, clear_output, output_file)
-    execute 'w'
-    let l:cmd = ''
-    if a:clear_output
-        let l:cmd .= 'clear && '
-    endif
-    let l:cmd .= '/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14 ' . a:flags . ' -o %< % -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
-    if !empty(a:input)
-        let l:cmd .= ' && ./%< < ' . a:input
-    else
-        let l:cmd .= ' && ./%<'
-    endif
-    if !empty(a:output_file)
-        let l:cmd .= ' > ' . a:output_file
-    endif
-    execute '!' . l:cmd
+  execute 'w'
+  let l:cmd = ''
+  if a:clear_output
+    let l:cmd .= 'clear && '
+  endif
+  let l:cmd .= '/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14 ' . a:flags . ' -o %< % -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
+  if !empty(a:input)
+    let l:cmd .= ' && ./%< < ' . a:input
+  else
+    let l:cmd .= ' && ./%<'
+  endif
+  if !empty(a:output_file)
+    let l:cmd .= ' > ' . a:output_file
+  endif
+  execute '!' . l:cmd
 endfunction
 
-" Common compilation flags for C++
+" Common flags for C++
 let g:common_flags = '-std=c++23 -Wall -Wextra -Wshadow -DONPC -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
 
-" Key Mappings for compiling C++ code with essential sanitizers
+" Key Mappings for Compilation and Debugging
 nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
 inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
 
-" F8 clears the terminal output before compiling and running (with output clearing)
+" Clear output before compiling (F8)
 nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 
-" Key mappings for compiling and running C++ code with output to output.txt (no input from file)
+" Output to file (F7)
 nnoremap <F7> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
 inoremap <F7> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
 
-" Key mappings for compiling and running C++ code with AddressSanitizer (redirecting input from a file)
-nnoremap <F10> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
-inoremap <F10> <ESC> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
+" Key Mappings for Snippet Expansion
+" Use UltiSnips for snippets
+imap <C-j> <Plug>(ultisnips_expand)
+snoremap <C-j> <Plug>(ultisnips_expand)
 
-" Key mappings for saving and compiling code
+" Load custom snippet directories
+let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips']
+
+" Save and Compile with Make (F3)
 noremap <F3> <ESC> :w <CR> :make <CR>
 inoremap <F3> <ESC> :w <CR> :make <CR>
+
 
