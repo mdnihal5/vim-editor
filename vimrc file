@@ -124,7 +124,7 @@ inoremap <F8> <ESC>:call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1
 nnoremap <F7> :call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
 inoremap <F7> <ESC>:call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
 
-" F6 → Compile & Run (NO clear screen) ✅ FIXED
+" F6 → Compile & Run (NO clear screen) 
 nnoremap <F6> :call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
 inoremap <F6> <ESC>:call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
 
