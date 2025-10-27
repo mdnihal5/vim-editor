@@ -1,123 +1,165 @@
-" ---------------- Plugin Setup ----------------
+"==============================================================================
+"  Author: md_nihal
+"  Date  : 27 Oct 2025
+"  Description: Clean Vim setup for C++ competitive programming on macOS
+"==============================================================================
+
+"------------------------------------------------------------------------------
+" Plugin Setup
+"------------------------------------------------------------------------------
 call plug#begin('~/.vim/plugged')
 Plug 'joshdick/onedark.vim'
+Plug 'SirVer/ultisnips'
 call plug#end()
 
-" ---------------- Colorscheme ----------------
+"------------------------------------------------------------------------------
+" Editor Settings
+"------------------------------------------------------------------------------
 syntax on
+filetype plugin indent on
 colorscheme onedark
 
-" ---------------- General Settings ----------------
 set number
 set relativenumber
-set tabstop=5
-set shiftwidth=5
+set tabstop=4
+set shiftwidth=4
 set expandtab
 set mouse=a
-set clipboard=unnamedplus        " Enable system clipboard
+set noswapfile
+set clipboard=unnamedplus
+set encoding=utf-8
+set fileformat=unix
+set autoindent
+set smartindent
 
-" ---------------- Copy/Paste Key Mappings ----------------
+"------------------------------------------------------------------------------
+" Clipboard and Selection Keybindings
+"------------------------------------------------------------------------------
 nnoremap <C-c> "+y
 vnoremap <C-c> "+y
-inoremap <C-c> <C-o>"+yy
+nnoremap <Space>c "+y
+vnoremap <Space>c "+y
+
 nnoremap <C-p> "+p
 vnoremap <C-p> "+p
-inoremap <C-p> <C-r><C-o>+
-nnoremap <C-a> ggVG"+y
-inoremap <C-a> <C-o>:call FormatAndCopyToClipboard()<CR>
+nnoremap <Space>p "+p
+vnoremap <Space>p "+p
 
-" ---------------- Formatting ----------------
-nnoremap <C-f> :call Format()<CR>
-inoremap <C-f> <C-o>:call Format()<CR>
+nnoremap <C-a> ggVG
+vnoremap <C-a> ggVG
+nnoremap <Space>a ggVG
+vnoremap <Space>a ggVG
 
+"------------------------------------------------------------------------------
+" Formatting Functions
+"------------------------------------------------------------------------------
 function! Format()
-    silent! execute 'norm! mz'
-    if &ft ==? 'c' || &ft ==? 'cpp' || &ft ==? 'php'
-        set formatprg=astyle\ --mode=c
-        silent! execute 'norm! gggqG'
-    elseif &ft ==? 'java'
-        set formatprg=astyle\ --mode=java
-        silent! execute 'norm! gggqG'
-    endif
-    silent! call RemoveTrailingSpaces()
-    silent! execute 'retab'
-    silent! execute 'gg=G'
-    silent! execute 'norm! `z'
-    set formatprg=
+  silent! execute 'normal! mz'
+  if &ft ==# 'c' || &ft ==# 'cpp' || &ft ==# 'hpp' || &ft ==# 'cc'
+    silent! execute '%!astyle --quiet'
+  elseif &ft ==# 'java'
+    silent! execute '%!astyle --mode=java --quiet'
+  elseif &ft ==# 'php'
+    silent! execute '%!astyle --mode=cs --quiet'
+  endif
+  silent! call RemoveTrailingSpaces()
+  silent! execute 'retab'
+  silent! execute 'gg=G'
+  silent! execute 'normal! `z'
 endfunction
 
 function! RemoveTrailingSpaces()
-    silent! execute '%s/\s\+$//ge'
-    silent! execute 'g/\v^$\n*%$/norm! dd'
+  silent! %s/\s\+$//e
 endfunction
 
 function! FormatAndCopyToClipboard()
-    let save_cursor = getpos('.')
-    %!astyle
-    normal! ggVG
-    normal! "+y
-    call setpos('.', save_cursor)
-    write
+  call Format()
+  normal! ggVG"+y
+  write
 endfunction
 
-" ---------------- Comment Toggle ----------------
-function! ToggleComment()
-    if mode() ==# 'v'
-        '<,'>s/^/\<C-r>=CommentChar()<CR>/
-    else
-        s/^/\<C-r>=CommentChar()<CR>/
-    endif
-endfunction
+"------------------------------------------------------------------------------
+" Formatting Key Mappings
+"------------------------------------------------------------------------------
+nnoremap <C-f> :call Format()<CR>
+vnoremap <C-f> :call Format()<CR>
+nnoremap <Space>f :call Format()<CR>
+vnoremap <Space>f :call Format()<CR>
 
-function! CommentChar()
-    if &filetype == 'python' || &filetype == 'sh' || &filetype == 'bash'
-        return '# '
-    elseif &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
-        return '// '
-    elseif &filetype == 'html'
-        return '<!-- '
-    else
-        return '# '
-    endif
-endfunction
-
-nnoremap <Leader>/ :call ToggleComment()<CR>
-vnoremap <Leader>/ :call ToggleComment()<CR>
-
-" ---------------- Compile and Run (C++) ----------------
+"------------------------------------------------------------------------------
+" Compilation & Execution
+"------------------------------------------------------------------------------
 function! CompileAndRun(flags, input, clear_output, output_file)
-    execute 'w'
-    let l:cmd = ''
-    if a:clear_output
-        let l:cmd .= 'clear && '
-    endif
-    let l:cmd .= 'g++ ' . a:flags . ' -o %< % -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
-    if !empty(a:input)
-        let l:cmd .= ' && ./%< < ' . a:input
-    else
-        let l:cmd .= ' && ./%<'
-    endif
-    if !empty(a:output_file)
-        let l:cmd .= ' > ' . a:output_file
-    endif
-    execute '!' . l:cmd
+  execute 'w'
+  let l:cmd = ''
+  if a:clear_output
+    let l:cmd .= 'clear && '
+  endif
+  let l:cmd .= '/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14 ' . a:flags . ' -o %< % -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
+  if !empty(a:input)
+    let l:cmd .= ' && ./%< < ' . a:input
+  else
+    let l:cmd .= ' && ./%<'
+  endif
+  if !empty(a:output_file)
+    let l:cmd .= ' > ' . a:output_file
+  endif
+  execute '!' . l:cmd
 endfunction
 
-let g:common_flags = '-std=c++20 -Wall -Wextra -Wshadow -DONPC -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
+let g:common_flags = '-std=c++23 -Wall -Wextra -Wshadow -DONPC -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
 
-nnoremap <F7> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
-inoremap <F7> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
+"------------------------------------------------------------------------------
+" Compilation Key Mappings
+"------------------------------------------------------------------------------
+" F9 → Compile & Run with sanitizers
+nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
+inoremap <F9> <ESC>:call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
 
+" F8 → Compile & Run (clear screen first)
 nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
-inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
+inoremap <F8> <ESC>:call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 
-nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
-inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
+" F7 → Compile using input/output files
+nnoremap <F7> :call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
+inoremap <F7> <ESC>:call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
 
-nnoremap <F11> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
-inoremap <F11> <ESC> :call CompileAndRun(g:common_flags . ' -O2 -fsanitize=address', 10, 'inp')<CR>
+" F6 → Compile & Run (NO clear screen) ✅ FIXED
+nnoremap <F6> :call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
+inoremap <F6> <ESC>:call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
 
-" ---------------- Save and Compile ----------------
-noremap <F4> <ESC>:w<CR>:make<CR>
-inoremap <F4> <ESC>:w<CR>:make<CR>
+" Space + b → Format + Compile + Run
+nnoremap <Space>b :call Format()<CR>:w<CR>:call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
+
+"------------------------------------------------------------------------------
+" Snippets (UltiSnips)
+"------------------------------------------------------------------------------
+imap <C-j> <Plug>(ultisnips_expand)
+snoremap <C-j> <Plug>(ultisnips_expand)
+let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips']
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+
+"------------------------------------------------------------------------------
+" Save & Compile with Make
+"------------------------------------------------------------------------------
+nnoremap <F3> :w<CR>:make<CR>
+inoremap <F3> <ESC>:w<CR>:make<CR>
+
+"------------------------------------------------------------------------------
+" Filetype Detection
+"------------------------------------------------------------------------------
+augroup cpp_files
+  autocmd!
+  autocmd BufNewFile,BufRead *.cpp,*.cc,*.cxx,*.hpp,*.h setlocal filetype=cpp
+augroup END
+
+"------------------------------------------------------------------------------
+" Optional Auto Format on Save
+"------------------------------------------------------------------------------
+autocmd BufWritePre *.cpp,*.cc,*.hpp,*.h,*.c call Format()
+
+"------------------------------------------------------------------------------
+" End of Config
+"------------------------------------------------------------------------------
 
