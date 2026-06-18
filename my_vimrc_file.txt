@@ -1,84 +1,94 @@
+"==============================================================================
+"  Author: md_nihal
+"  Date  : 27 Oct 2025
+"  Description: Clean Vim setup for C++ competitive programming on macOS
+"==============================================================================
+
+"------------------------------------------------------------------------------
 " Plugin Setup
+"------------------------------------------------------------------------------
 call plug#begin('~/.vim/plugged')
 Plug 'joshdick/onedark.vim'
-Plug 'SirVer/ultisnips'  " UltiSnips Plugin
+Plug 'SirVer/ultisnips'
 call plug#end()
 
-" Colorscheme
+"------------------------------------------------------------------------------
+" Editor Settings
+"------------------------------------------------------------------------------
+syntax on
+filetype plugin indent on
 colorscheme onedark
 
-" General Settings
 set number
 set relativenumber
 set tabstop=4
 set shiftwidth=4
 set expandtab
 set mouse=a
-
-" Clipboard support (optional)
+set noswapfile
 set clipboard=unnamedplus
+set encoding=utf-8
+set fileformat=unix
+set autoindent
+set smartindent
 
-" Key Mappings for Copy-Paste
-nnoremap <C-c> "+y            " Copy in normal mode with Ctrl+C
-vnoremap <C-c> "+y            " Copy in visual mode with Ctrl+C
-nnoremap <Space>c "+y         " Copy in normal mode with Space+C
-vnoremap <Space>c "+y         " Copy in visual mode with Space+C
+"------------------------------------------------------------------------------
+" Clipboard and Selection Keybindings
+"------------------------------------------------------------------------------
+nnoremap <C-c> "+y
+vnoremap <C-c> "+y
+nnoremap <Space>c "+y
+vnoremap <Space>c "+y
 
-nnoremap <C-p> "+p            " Paste in normal mode with Ctrl+P
-vnoremap <C-p> "+p            " Paste in visual mode with Ctrl+P
-nnoremap <Space>p "+p         " Paste in normal mode with Space+P
-vnoremap <Space>p "+p         " Paste in visual mode with Space+P
+nnoremap <C-p> "+p
+vnoremap <C-p> "+p
+nnoremap <Space>p "+p
+vnoremap <Space>p "+p
 
-nnoremap <C-a> :call Format()<CR>ggVG"+y
-vnoremap <C-a> :call Format()<CR>ggVG"+y
+nnoremap <C-a> ggVG
+vnoremap <C-a> ggVG
+nnoremap <Space>a ggVG
+vnoremap <Space>a ggVG
 
-" Formatting Key Mappings
-nnoremap <C-f> :call Format()<CR>    " Format in normal mode with Ctrl+F
-vnoremap <C-f> :call Format()<CR>    " Format in visual mode with Ctrl+F
-nnoremap <Space>f :call Format()<CR> " Format in normal mode with Space+F
-vnoremap <Space>f :call Format()<CR> " Format in visual mode with Space+F
-
-" Select All and Copy Mappings
-nnoremap <C-r> ggVG               " Select all and copy in normal mode with Ctrl+R
-vnoremap <C-r> ggVG               " Select all and copy in visual mode with Ctrl+R
-nnoremap <Space>a ggVG            " Select all and copy in normal mode with Space+R
-vnoremap <Space>a ggVG            " Select all and copy in visual mode with Space+R
-
-" Function to format code
+"------------------------------------------------------------------------------
+" Formatting Functions
+"------------------------------------------------------------------------------
 function! Format()
-  silent! execute 'norm! mz'
-  if &ft ==? 'c' || &ft ==? 'cpp' || &ft ==? 'php'
-    set formatprg=astyle\ --mode=c
-    silent! execute 'norm! gggqG'
-  elseif &ft ==? 'java'
-    set formatprg=astyle\ --mode=java
-    silent! execute 'norm! gggqG'
+  silent! execute 'normal! mz'
+  if &ft ==# 'c' || &ft ==# 'cpp' || &ft ==# 'hpp' || &ft ==# 'cc'
+    silent! execute '%!astyle --quiet'
+  elseif &ft ==# 'java'
+    silent! execute '%!astyle --mode=java --quiet'
+  elseif &ft ==# 'php'
+    silent! execute '%!astyle --mode=cs --quiet'
   endif
   silent! call RemoveTrailingSpaces()
   silent! execute 'retab'
   silent! execute 'gg=G'
-  silent! execute 'norm! `z'
-  set formatprg=
+  silent! execute 'normal! `z'
 endfunction
 
-" Remove trailing spaces
 function! RemoveTrailingSpaces()
-  silent! execute '%s/\s\+$//ge'
-  silent! execute 'g/\v^\$\n\*%\$/norm! dd'
+  silent! %s/\s\+$//e
 endfunction
 
-" Format and copy to clipboard
 function! FormatAndCopyToClipboard()
-  let save_cursor = getpos('.')
-  %!astyle
-  normal ggVG
-  normal "+y
-  call setpos('.', save_cursor)
+  call Format()
+  normal! ggVG"+y
   write
 endfunction
 
+"------------------------------------------------------------------------------
+" Formatting Key Mappings
+"------------------------------------------------------------------------------
+nnoremap <C-f> :call Format()<CR>
+vnoremap <C-f> :call Format()<CR>
+nnoremap <Space>f :call Format()<CR>
+vnoremap <Space>f :call Format()<CR>
 
-" Compilation Key Mappings
+"------------------------------------------------------------------------------
+" Compilation & Execution
+"------------------------------------------------------------------------------
 function! CompileAndRun(flags, input, clear_output, output_file)
   execute 'w'
   let l:cmd = ''
@@ -97,31 +107,59 @@ function! CompileAndRun(flags, input, clear_output, output_file)
   execute '!' . l:cmd
 endfunction
 
-" Common flags for C++
 let g:common_flags = '-std=c++23 -Wall -Wextra -Wshadow -DONPC -Wno-misleading-indentation -Wno-unused-variable -Wno-sign-compare'
 
-" Key Mappings for Compilation and Debugging
+"------------------------------------------------------------------------------
+" Compilation Key Mappings
+"------------------------------------------------------------------------------
+" F9 → Compile & Run with sanitizers
 nnoremap <F9> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
-inoremap <F9> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
+inoremap <F9> <ESC>:call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, '')<CR>
 
-" Clear output before compiling (F8)
+" F8 → Compile & Run (clear screen first)
 nnoremap <F8> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
-inoremap <F8> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
+inoremap <F8> <ESC>:call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g', '', 1, '')<CR>
 
-" Output to file (F7)
-nnoremap <F7> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
-inoremap <F7> <ESC> :call CompileAndRun(g:common_flags . ' -O3 -DDEBUG -g -fsanitize=undefined,address', '', 0, 'output.txt')<CR>
+" F7 → Compile using input/output files
+nnoremap <F7> :call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
+inoremap <F7> <ESC>:call CompileAndRun('-std=c++23 -O2 -Wall -Wextra -DDEBUG', 'input.txt', 0, 'output.txt')<CR>
 
-" Key Mappings for Snippet Expansion
-" Use UltiSnips for snippets
+" F6 → Compile & Run (NO clear screen) ✅ FIXED
+nnoremap <F6> :call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
+inoremap <F6> <ESC>:call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
+
+" Space + b → Format + Compile + Run
+nnoremap <Space>b :call Format()<CR>:w<CR>:call CompileAndRun(g:common_flags . ' -O2 -DLOCAL', '', 0, '')<CR>
+
+"------------------------------------------------------------------------------
+" Snippets (UltiSnips)
+"------------------------------------------------------------------------------
 imap <C-j> <Plug>(ultisnips_expand)
 snoremap <C-j> <Plug>(ultisnips_expand)
-
-" Load custom snippet directories
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips']
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
-" Save and Compile with Make (F3)
-noremap <F3> <ESC> :w <CR> :make <CR>
-inoremap <F3> <ESC> :w <CR> :make <CR>
+"------------------------------------------------------------------------------
+" Save & Compile with Make
+"------------------------------------------------------------------------------
+nnoremap <F3> :w<CR>:make<CR>
+inoremap <F3> <ESC>:w<CR>:make<CR>
 
+"------------------------------------------------------------------------------
+" Filetype Detection
+"------------------------------------------------------------------------------
+augroup cpp_files
+  autocmd!
+  autocmd BufNewFile,BufRead *.cpp,*.cc,*.cxx,*.hpp,*.h setlocal filetype=cpp
+augroup END
+
+"------------------------------------------------------------------------------
+" Optional Auto Format on Save
+"------------------------------------------------------------------------------
+autocmd BufWritePre *.cpp,*.cc,*.hpp,*.h,*.c call Format()
+
+"------------------------------------------------------------------------------
+" End of Config
+"------------------------------------------------------------------------------
 
