@@ -5,8 +5,11 @@ snippet normal
 */
 
     #include "bits/stdc++.h"
-    using namespace std;
-    #define all(x) x.begin(),x.end()
+	using namespace std;
+
+	#pragma GCC optimize("Ofast,unroll-loops,no-stack-protector,fast-math,inline")
+	#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,lzcnt,mmx,abm,avx,avx2,fma")
+	#define md_nihal ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);    #define all(x) x.begin(),x.end()
     #define ALL(x) x.rbegin(),x.rend()
     #define int long long
     #define endl "\n" // remove this for interactive problems
@@ -27,7 +30,7 @@ void ____solve() {
 /*============================================= MAIN =============================================*/
 
 int32_t main() {
-    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    md_nihal;
     int Test = 1;  $1 cin >> Test;
 
     for (int Case = 1; Case <= Test; Case++) {
