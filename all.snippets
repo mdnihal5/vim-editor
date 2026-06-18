@@ -1,0 +1,177 @@
+snippet normal
+/*
+        Author: md_nihal
+        Created on : `!v strftime('%A %d %B %Y %I:%M:%S %p')`
+*/
+
+    #include "bits/stdc++.h"
+    using namespace std;
+    #define all(x) x.begin(),x.end()
+    #define ALL(x) x.rbegin(),x.rend()
+    #define int long long
+    #define endl "\n" // remove this for interactive problems
+    const int mod = 1E9 + 7, MAX = 1E7 + 7, N = 1E5 + 5, inf = 1E18 ;
+
+    #ifndef DEBUG
+        #define debug(x...);
+    #else
+        #include "/Users/nihal/necessary/contest/debug.hpp"
+    #endif
+
+/*=========================================== SOLUTION ===========================================*/
+
+void ____solve() {
+       $0 
+}
+
+/*============================================= MAIN =============================================*/
+
+int32_t main() {
+    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    int Test = 1;  $1 cin >> Test;
+
+    for (int Case = 1; Case <= Test; Case++) {
+	   debug(Case);
+        ____solve();
+    }
+} 
+endsnippet
+
+snippet meta "Meta Hacker Cup template (fixed input/output files)" b
+/*
+        Author: md_nihal
+        Created on : `!v strftime('%A %d %B %Y %I:%M:%S %p')`
+        Contest: Meta Hacker Cup
+        Fixed I/O per file (input.txt / output.txt)
+*/
+
+#include "bits/stdc++.h"
+using namespace std;
+
+#define all(x) (x).begin(), (x).end()
+#define ALL(x) (x).rbegin(), (x).rend()
+#define int long long
+#define endl "\\n" // remove this for interactive problems
+
+const int mod = 1e9 + 7;
+const int MAX = 1e7 + 7;
+const int N = 1e5 + 5;
+const int inf = 1e18;
+
+#ifndef DEBUG
+    #define debug(x...);
+#else
+    #include "/Users/nihal/necessary/contest/debug.hpp"
+#endif
+
+/*=========================================== SOLUTION ===========================================*/
+
+void ____solve() {
+    $0
+}
+
+/*============================================= MAIN =============================================*/
+
+int32_t main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+
+    int Test = 1;
+    $1 cin >> Test;
+
+    for (int i = 1; i <= Test; i++) {
+        cout << "Case #" << i << ": ";
+        ____solve();
+    }
+
+    return 0;
+}
+endsnippet
+
+snippet leetcode "LC"
+#include "bits/stdc++.h"
+#pragma GCC optimize("Ofast,unroll-loops,no-stack-protector,fast-math,inline")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,lzcnt,mmx,abm,avx,avx2,fma")
+#define fast_io ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define all(x) x.begin(),x.end()
+#define ll long long
+
+class Solution {
+public:
+	$0
+};
+auto init=[](){
+    fast_io;
+	$1
+    return 1;
+}();
+endsnippet
+snippet ModInt "Mod Int"
+template <int MOD=998'244'353>
+struct Modular {
+  int value;
+  static const int MOD_value = MOD;
+
+  Modular(long long v = 0) { value = v % MOD; if (value < 0) value += MOD;}
+  Modular(long long a, long long b) : value(0){ *this += a; *this /= b;}
+
+  Modular& operator+=(Modular const& b) {value += b.value; if (value >= MOD) value -= MOD; return *this;}
+  Modular& operator-=(Modular const& b) {value -= b.value; if (value < 0) value += MOD;return *this;}
+  Modular& operator*=(Modular const& b) {value = (long long)value * b.value % MOD;return *this;}
+
+  friend Modular mexp(Modular a, long long e) {
+    Modular res = 1; while (e) { if (e&1) res *= a; a *= a; e >>= 1; }
+    return res;
+  }
+  friend Modular pow(Modular a, long long e) { return mexp(a,e); }
+  friend Modular inverse(Modular a) { return mexp(a, MOD - 2); }
+
+  Modular& operator/=(Modular const& b) { return *this *= inverse(b); }
+  friend Modular operator+(Modular a, Modular const b) { return a += b; }
+  friend Modular operator-(Modular a, Modular const b) { return a -= b; }
+  friend Modular operator-(Modular const a) { return 0 - a; }
+  friend Modular operator*(Modular a, Modular const b) { return a *= b; }
+  friend Modular operator/(Modular a, Modular const b) { return a /= b; }
+
+  friend bool operator==(Modular const& a, Modular const& b) {return a.value == b.value;}
+  friend bool operator!=(Modular const& a, Modular const& b) {return a.value != b.value;}
+  friend bool operator<(Modular const& a, Modular const& b) {return a.value < b.value;}
+  friend bool operator>(Modular const& a, Modular const& b) {return a.value > b.value;}
+
+  friend std::ostream& operator<<(std::ostream& os, Modular const& a) {return os << a.value;}
+};
+using mint = Modular<1'000'000'007>;
+endsnippet
+snippet primes "MOD"
+bool marked[N];
+int  sp[N];
+
+void Sieve() {
+    for (int i = 2; i < N; i += 2)  sp[i] = 2;//even numbers have smallest prime factor 2
+
+    for (int i = 3; i < N; i += 2) {
+        if (!marked[i]) {
+            sp[i] = i;
+
+            for (int j = i; (j * i) < N; j += 2) {
+                if (!marked[j * i]) marked[j * i] = true, sp[j * i] = i;
+            }
+        }
+    }
+}
+
+
+vector <int> factorize (int k) {
+    vector <int> ans;
+
+    while (k > 1) {
+        ans.push_back (sp[k]);
+        k /= sp[k];
+    }
+
+    return ans;
+}
+endsnippet
